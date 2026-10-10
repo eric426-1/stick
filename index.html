@@ -24,8 +24,7 @@
         }
         .sticky-note:hover {
             transform: translateY(-4px) rotate(1deg);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);        }
         .pin {
             width: 16px;
             height: 16px;
@@ -89,7 +88,7 @@
             <div class="flex flex-col gap-3">
                 <input type="text" id="noteTitleInput" placeholder="標題（選填）..." 
                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 bg-slate-50/50 transition-all">
-                <textarea id="noteContentInput" placeholder="在這裡輸入便利貼內容..." rows="3"
+                <textarea id="noteContentInput" placeholder="在這裡輸入便利貼內容（支援貼上文字）..." rows="3"
                           class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-slate-50/50 transition-all resize-none"></textarea>
                 <div class="flex justify-end">
                     <button id="addNoteBtn" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-95">
@@ -217,7 +216,7 @@
                         {
                             id: 'note-' + Date.now(),
                             title: '歡迎使用繽紛便利貼！ 🎉',
-                            content: '1. 可隨時切換不同顏色的便利貼\n2. 點擊編輯按鈕或直接修改內容\n3. 重新整理後內容會自動保留',
+                            content: '1. 可隨時切換不同顏色的便利貼\n2. 點擊文字直接修改內容\n3. 支援文字貼上與 LocalStorage 自動儲存',
                             color: 'yellow',
                             updatedAt: new Date().toLocaleString()
                         }
@@ -252,7 +251,6 @@
                     const color = btn.getAttribute('data-color');
                     selectedColor = color;
                     btn.classList.remove('border-transparent');
-                    // Add corresponding border color ring
                     const borderColors = { yellow: 'border-amber-400', pink: 'border-rose-400', blue: 'border-sky-400', green: 'border-emerald-400', purple: 'border-purple-400' };
                     btn.classList.add(borderColors[color] || 'border-slate-400');
                 });
@@ -295,14 +293,13 @@
             const content = noteContentInput.value.trim();
 
             if (!content && !title) {
-                // Shake input fields gently if empty
                 noteContentInput.classList.add('ring-2', 'ring-rose-400');
                 setTimeout(() => noteContentInput.classList.remove('ring-2', 'ring-rose-400'), 500);
                 return;
             }
 
             const newNote = {
-                id: 'note-' + Date.now() + '-' + Math.random().toString(36.substring(2, 6)),
+                id: 'note-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                 title: title,
                 content: content,
                 color: selectedColor,
@@ -372,12 +369,10 @@
 
                 contentInput.addEventListener('input', (e) => {
                     updateNoteField(note.id, 'content', e.target.value);
-                    // Auto-adjust height
                     contentInput.style.height = 'auto';
                     contentInput.style.height = contentInput.scrollHeight + 'px';
                 });
 
-                // Initialize textarea height
                 setTimeout(() => {
                     contentInput.style.height = 'auto';
                     contentInput.style.height = contentInput.scrollHeight + 'px';
@@ -419,7 +414,8 @@
             return str
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace(>"/g, "&quot;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
 
